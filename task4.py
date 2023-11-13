@@ -3,13 +3,27 @@
 #x1+x2+3x3=22
 import numpy as np
 
+# каноническая формула для решения слау методом простой итерации
+# x_i = (b_i - sum(a_ij*x_j))/a_ii
+
 
 A = [[4, 2, 1, 25], [2, 4, 1, 27], [1, 1, 3, 22]]
 eps = 0.05
 w = 1.5
-#mode = 1 # метод простой итерации
+mode = 1 # метод простой итерации
 #mode = 2 # метод зейделя
-mode = 3 # метод верхней релаксации
+#mode = 3 # метод верхней релаксации
+
+# перемножение матриц для проверки
+def mult(A, B):
+    n = len(A)
+    m = len(B[0])
+    C = [[0] * m for i in range(n)]
+    for i in range(n):
+        for j in range(m):
+            for k in range(len(B)):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
 
 # метод простой итерации для решения слау
 def func(A, x, t, mode):
@@ -48,7 +62,9 @@ def func(A, x, t, mode):
     B = [0] * len(A)
     flag = 0
     for i in range(len(A)):
-        B[i] = abs(xi[i] - x[i])/abs(xi[i])
+        # проверка по невязке
+        B[i] = abs(sum([A[i][j] * xi[j] for j in range(len(A))]) - A[i][len(A)])
+        #B[i] = abs(mult(A[i], xi[i]))
         if B[i] > eps:
             flag = 1
     # вывести матрицу для проверки сходимости
